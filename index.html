@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treino de Fala em Inglês</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .pulse-mic { animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between p-4 max-w-md mx-auto">
+
+  <!-- Topo -->
+  <header class="text-center py-2 border-b border-slate-800">
+    <h1 class="text-lg font-bold text-blue-400 flex items-center justify-center gap-2">
+      <i class="fa-solid fa-graduation-cap"></i> Treino de Escuta e Fala
+    </h1>
+  </header>
+
+  <!-- Cartão de Exercício -->
+  <main class="my-auto space-y-4">
+    
+    <!-- Ícone de Feedback -->
+    <div id="statusIcon" class="text-center my-2">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800 text-4xl shadow-lg border border-slate-700">
+        🔊
+      </div>
+    </div>
+
+    <!-- Caixa da Frase -->
+    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 text-center">
+      
+      <!-- Frase em Inglês -->
+      <div>
+        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Frase em Inglês:</span>
+        <h2 id="txtIngles" class="text-2xl font-black text-white mt-1">I'm fine, thanks.</h2>
+      </div>
+
+      <!-- Pronúncia Facilitada -->
+      <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/50">
+        <span class="text-xs font-bold text-emerald-400 uppercase">Pronúncia Facilitada (Leia assim):</span>
+        <p id="txtFonetica" class="text-lg font-bold text-emerald-300 mt-0.5">"Áim fáin, thénks."</p>
+      </div>
+
+      <!-- Tradução -->
+      <div>
+        <span class="text-xs font-bold text-slate-400 uppercase">Tradução:</span>
+        <p id="txtTraducao" class="text-sm font-medium text-slate-300">Eu estou bem, obrigado.</p>
+      </div>
+
+      <!-- Botão para Ouvir o App Falar -->
+      <button onclick="falarFraseAtual()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl shadow flex items-center justify-center gap-2 transition-all">
+        <i class="fa-solid fa-volume-high text-lg"></i> Ouvir o Aplicativo Falar
+      </button>
+
+    </div>
+
+    <!-- Resultado / Feedback -->
+    <div id="feedbackBox" class="hidden p-4 rounded-xl text-center space-y-1 transition-all">
+      <p id="feedbackTitle" class="font-bold text-lg"></p>
+      <p id="feedbackMsg" class="text-xs opacity-90"></p>
+    </div>
+
+    <!-- Botão do Microfone para Repetir -->
+    <div class="text-center pt-2">
+      <button id="btnMic" onclick="alternarGravacao()" class="w-20 h-20 bg-emerald-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto hover:bg-emerald-500 active:scale-95 transition-all">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <p id="micStatus" class="text-xs text-slate-400 mt-2 font-medium">Ouça o app e toque no microfone para repetir!</p>
+    </div>
+
+  </main>
+
+  <!-- Rodapé / Navegação -->
+  <footer class="flex justify-between items-center border-t border-slate-800 pt-3 text-xs text-slate-400">
+    <button onclick="fraseAnterior()" class="px-3 py-1.5 bg-slate-800 rounded-lg hover:bg-slate-700">
+      <i class="fa-solid fa-chevron-left"></i> Anterior
+    </button>
+    <span id="txtPasso">Frase 1 de 6</span>
+    <button onclick="proximaFrase()" class="px-3 py-1.5 bg-slate-800 rounded-lg hover:bg-slate-700">
+      Próxima <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </footer>
+
+  <script>
+    const listaFrases = [
+      { en: "I'm fine, thanks", fon: "Áim fáin, thénks", pt: "Eu estou bem, obrigado" },
+      { en: "How are you?", fon: "Ráu ár iú?", pt: "Como você está?" },
+      { en: "Nice to meet you", fon: "Náis tu mít iú", pt: "Prazer em conhecê-lo" },
+      { en: "Where is the bathroom?", fon: "Uér iz dâ báth-rum?", pt: "Onde fica o banheiro?" },
+      { en: "Can you help me?", fon: "Kén iú rélp mí?", pt: "Pode me ajudar?" },
+      { en: "Have a nice day", fon: "Rév ê náis déi", pt: "Tenha um bom dia" }
+    ];
+
+    let indiceAtual = 0;
+    let gravando = false;
+    let recognizer = null;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognizer = new SpeechRecognition();
+      recognizer.lang = 'en-US';
+      recognizer.continuous = false;
+      recognizer.interimResults = false;
+
+      recognizer.onresult = function(event) {
+        const textoOuvido = event.results[0][0].transcript;
+        validarPronuncia(textoOuvido);
+      };
+
+      recognizer.onerror = function() {
+        mostrarFeedback(false, "Não consegui ouvir bem. Tente falar novamente mais perto do microfone.");
+        pararMicVisual();
+      };
+
+      recognizer.onend = function() {
+        pararMicVisual();
+      };
+    }
+
+    function atualizarTela() {
+      const item = listaFrases[indiceAtual];
+      document.getElementById('txtIngles').innerText = item.en;
+      document.getElementById('txtFonetica').innerText = `"${item.fon}"`;
+      document.getElementById('txtTraducao').innerText = item.pt;
+      document.getElementById('txtPasso').innerText = `Frase ${indiceAtual + 1} de ${listaFrases.length}`;
+      
+      document.getElementById('statusIcon').innerHTML = `
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800 text-4xl shadow-lg border border-slate-700">🔊</div>
+      `;
+      document.getElementById('feedbackBox').classList.add('hidden');
+    }
+
+    function falarFraseAtual() {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(listaFrases[indiceAtual].en);
+      u.lang = 'en-US';
+      u.rate = 0.85;
+      window.speechSynthesis.speak(u);
+    }
+
+    function alternarGravacao() {
+      if (!recognizer) {
+        alert("O seu navegador não suporta reconhecimento de voz direto. Abra o link no Google Chrome.");
+        return;
+      }
+
+      if (gravando) {
+        recognizer.stop();
+        pararMicVisual();
+      } else {
+        window.speechSynthesis.cancel();
+        recognizer.start();
+        gravando = true;
+        const btn = document.getElementById('btnMic');
+        btn.className = "w-20 h-20 bg-red-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto pulse-mic";
+        document.getElementById('micStatus').innerText = "Sua vez! Fale em Inglês agora...";
+      }
+    }
+
+    function pararMicVisual() {
+      gravando = false;
+      const btn = document.getElementById('btnMic');
+      btn.className = "w-20 h-20 bg-emerald-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto hover:bg-emerald-500";
+      document.getElementById('micStatus').innerText = "Ouça o app e toque no microfone para repetir!";
+    }
+
+    function limparTexto(txt) {
+      return txt.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function validarPronuncia(falado) {
+      const esperado = listaFrases[indiceAtual].en;
+      const fL = limparTexto(falado);
+      const eL = limparTexto(esperado);
+
+      if (fL === eL || fL.includes(eL) || eL.includes(fL)) {
+        // ACERTO (✔️)
+        document.getElementById('statusIcon').innerHTML = `
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 text-5xl shadow-lg animate-bounce">
+            ✔️
+          </div>
+        `;
+        mostrarFeedback(true, `Perfeito! Você disse exatamente: "${falado}". Passando para a próxima...`);
+        
+        setTimeout(() => {
+          proximaFrase();
+        }, 2200);
+
+      } else {
+        // ERRO (❌ / DICA)
+        document.getElementById('statusIcon').innerHTML = `
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-500 text-amber-400 text-5xl shadow-lg">
+            ❌
+          </div>
+        `;
+        mostrarFeedback(false, `Eu ouvi "${falado}". Tente repetir seguindo o som: "${listaFrases[indiceAtual].fon}".`);
+      }
+    }
+
+    function mostrarFeedback(sucesso, mensagem) {
+      const box = document.getElementById('feedbackBox');
+      const title = document.getElementById('feedbackTitle');
+      const msg = document.getElementById('feedbackMsg');
+
+      box.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-200', 'border-emerald-700', 'bg-amber-950', 'text-amber-200', 'border-amber-700');
+      
+      if (sucesso) {
+        box.classList.add('bg-emerald-950', 'text-emerald-200', 'border', 'border-emerald-700');
+        title.innerText = "✨ Mandou bem!";
+      } else {
+        box.classList.add('bg-amber-950', 'text-amber-200', 'border', 'border-amber-700');
+        title.innerText = "💡 Tente de novo!";
+      }
+
+      msg.innerText = mensagem;
+    }
+
+    function proximaFrase() {
+      if (indiceAtual < listaFrases.length - 1) {
+        indiceAtual++;
+      } else {
+        indiceAtual = 0;
+      }
+      atualizarTela();
+    }
+
+    function fraseAnterior() {
+      if (indiceAtual > 0) {
+        indiceAtual--;
+        atualizarTela();
+      }
+    }
+
+    window.onload = atualizarTela;
+  </script>
+</body>
+</html>
