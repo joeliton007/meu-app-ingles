@@ -139,13 +139,12 @@
     <div class="phrase-pt" id="phrase-pt">...</div>
 
     <div class="speed-control">
-        <label for="speed-select">🐢 Velocidade da Voz:</label>
+        <label for="speed-select">🐢 Modo de Fala:</label>
         <select id="speed-select">
-            <option value="0.1">0.1x (Passo a Passo)</option>
-            <option value="0.2">0.2x (Super Lenta)</option>
-            <option value="0.4" selected>0.4x (Lenta)</option>
-            <option value="0.6">0.6x (Média)</option>
-            <option value="0.85">0.85x (Normal)</option>
+            <option value="word-by-word" selected>Extremamente Lenta (Pausa entre palavras)</option>
+            <option value="0.5">Muito Lenta (Frase corrida)</option>
+            <option value="0.75">Lenta / Normal</option>
+            <option value="1.0">Velocidade Nativa</option>
         </select>
     </div>
 
@@ -297,21 +296,34 @@ function loadPhrase() {
 
 function speakPhrase() {
     window.speechSynthesis.cancel();
+    const mode = document.getElementById('speed-select').value;
     const text = phrases[currentIndex].en;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    
-    // Pega a velocidade selecionada no menu
-    const selectedSpeed = parseFloat(document.getElementById('speed-select').value);
-    utterance.rate = selectedSpeed;
 
     const voices = window.speechSynthesis.getVoices();
     const usVoice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
-    if (usVoice) {
-        utterance.voice = usVoice;
-    }
 
-    window.speechSynthesis.speak(utterance);
+    if (mode === 'word-by-word') {
+        // Fala palavra por palavra com pausa nítida entre elas
+        const words = text.split(' ');
+        let delay = 0;
+
+        words.forEach((word) => {
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.6; // velocidade tranquila
+                if (usVoice) utterance.voice = usVoice;
+                window.speechSynthesis.speak(utterance);
+            }, delay);
+            delay += 750; // Pausa de 0.75s entre cada palavra
+        });
+    } else {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = parseFloat(mode);
+        if (usVoice) utterance.voice = usVoice;
+        window.speechSynthesis.speak(utterance);
+    }
 }
 
 function nextPhrase() {
