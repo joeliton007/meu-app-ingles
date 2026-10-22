@@ -160,7 +160,7 @@
     <div class="phrase-pt" id="phrase-pt">...</div>
 
     <button class="btn btn-speed" onclick="openModal()">⚙️ Velocidade: <span id="current-speed-label">Super Lenta</span></button>
-    <button class="btn" onclick="speakPhrase()">🔊 Ouvir Pronúncia</button>
+    <button class="btn" onclick="speakPhraseTwice()">🔊 Ouvir Pronúncia (2x)</button>
     <button class="btn btn-mic" id="btn-mic" onclick="toggleListening()">🎙️ Falar Agora</button>
 
     <div class="nav-btns">
@@ -345,10 +345,7 @@ function getBestVoice() {
     return best;
 }
 
-function speakPhrase() {
-    window.speechSynthesis.cancel();
-    clearWordTimeouts();
-
+function playOnce(onEndedCallback) {
     const text = phrases[currentIndex].en;
     const usVoice = getBestVoice();
 
@@ -356,12 +353,17 @@ function speakPhrase() {
         const words = text.split(' ');
         let delay = 0;
 
-        words.forEach((word) => {
+        words.forEach((word, index) => {
             const timeout = setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.65;
                 if (usVoice) utterance.voice = usVoice;
+                
+                if (index === words.length - 1 && onEndedCallback) {
+                    utterance.onend = onEndedCallback;
+                }
+                
                 window.speechSynthesis.speak(utterance);
             }, delay);
 
@@ -373,8 +375,24 @@ function speakPhrase() {
         utterance.lang = 'en-US';
         utterance.rate = parseFloat(currentSpeed);
         if (usVoice) utterance.voice = usVoice;
+        if (onEndedCallback) utterance.onend = onEndedCallback;
         window.speechSynthesis.speak(utterance);
     }
+}
+
+function speakPhraseTwice() {
+    window.speechSynthesis.cancel();
+    clearWordTimeouts();
+
+    // Primeira vez
+    playOnce(() => {
+        // Pausa de 1.2 segundos entre as duas falas
+        const t = setTimeout(() => {
+            // Segunda vez
+            playOnce();
+        }, 1200);
+        wordTimeouts.push(t);
+    });
 }
 
 function nextPhrase() {
