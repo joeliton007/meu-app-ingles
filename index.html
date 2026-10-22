@@ -50,30 +50,6 @@
             color: #bbb;
             margin-bottom: 20px;
         }
-        .speed-control {
-            margin-bottom: 20px;
-            background-color: #2a2a2a;
-            padding: 10px 15px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .speed-control label {
-            font-size: 0.95rem;
-            color: #ddd;
-            font-weight: 500;
-        }
-        .speed-control select {
-            background-color: #3d3d3d;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            outline: none;
-            cursor: pointer;
-        }
         .btn {
             background-color: #2b2b2b;
             color: white;
@@ -82,13 +58,20 @@
             border-radius: 10px;
             font-size: 1rem;
             cursor: pointer;
-            margin: 8px 4px;
+            margin: 8px 0;
             transition: all 0.2s ease;
             width: 100%;
+            box-sizing: border-box;
         }
         .btn:hover {
             background-color: #3d3d3d;
             border-color: #666;
+        }
+        .btn-speed {
+            background-color: #212121;
+            border-color: #555;
+            color: #ffca28;
+            font-size: 0.95rem;
         }
         .btn-mic {
             background-color: #2e7d32;
@@ -108,7 +91,7 @@
         .nav-btns {
             display: flex;
             justify-content: space-between;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .nav-btns .btn {
             width: 48%;
@@ -128,6 +111,44 @@
             background-color: #b71c1c;
             color: #e57373;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #252525;
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 320px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: #4da6ff;
+        }
+        .option-btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .option-btn.active {
+            background-color: #2e7d32;
+            border-color: #81c784;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -138,16 +159,7 @@
     <div class="phrase-phonetic" id="phrase-phonetic">...</div>
     <div class="phrase-pt" id="phrase-pt">...</div>
 
-    <div class="speed-control">
-        <label for="speed-select">🐢 Modo de Fala:</label>
-        <select id="speed-select">
-            <option value="word-by-word" selected>Extremamente Lenta (Pausa entre palavras)</option>
-            <option value="0.5">Muito Lenta (Frase corrida)</option>
-            <option value="0.75">Lenta / Normal</option>
-            <option value="1.0">Velocidade Nativa</option>
-        </select>
-    </div>
-
+    <button class="btn btn-speed" onclick="openModal()">⚙️ Velocidade: <span id="current-speed-label">Super Lenta</span></button>
     <button class="btn" onclick="speakPhrase()">🔊 Ouvir Pronúncia</button>
     <button class="btn btn-mic" id="btn-mic" onclick="toggleListening()">🎙️ Falar Agora</button>
 
@@ -157,6 +169,16 @@
     </div>
 
     <div class="result" id="result"></div>
+</div>
+
+<div class="modal" id="speedModal">
+    <div class="modal-content">
+        <h3>Escolha a Velocidade</h3>
+        <button class="option-btn active" id="opt-word-by-word" onclick="selectSpeed('word-by-word', 'Super Lenta')">1. Super Lenta (Pausada)</button>
+        <button class="option-btn" id="opt-0.5" onclick="selectSpeed('0.5', 'Lenta')">2. Lenta (Corrida)</button>
+        <button class="option-btn" id="opt-0.75" onclick="selectSpeed('0.75', 'Normal')">3. Normal</button>
+        <button class="option-btn" id="opt-1.0" onclick="selectSpeed('1.0', 'Nativa')">4. Nativa</button>
+    </div>
 </div>
 
 <script>
@@ -284,8 +306,23 @@ const phrases = [
 
 let currentIndex = 0;
 let recognition = null;
+let currentSpeed = 'word-by-word';
+let wordTimeouts = [];
+
+function openModal() {
+    document.getElementById('speedModal').style.display = 'flex';
+}
+
+function selectSpeed(value, label) {
+    currentSpeed = value;
+    document.getElementById('current-speed-label').innerText = label;
+    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('opt-' + value).classList.add('active');
+    document.getElementById('speedModal').style.display = 'none';
+}
 
 function loadPhrase() {
+    clearWordTimeouts();
     const item = phrases[currentIndex];
     document.getElementById('counter').innerText = `Frase ${currentIndex + 1} de ${phrases.length}`;
     document.getElementById('phrase-en').innerText = item.en;
@@ -294,33 +331,47 @@ function loadPhrase() {
     document.getElementById('result').style.display = 'none';
 }
 
+function clearWordTimeouts() {
+    wordTimeouts.forEach(t => clearTimeout(t));
+    wordTimeouts = [];
+}
+
+function getBestVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    let best = voices.find(v => (v.lang === 'en-US' || v.lang === 'en_US') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Enhanced')));
+    if (!best) {
+        best = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
+    }
+    return best;
+}
+
 function speakPhrase() {
     window.speechSynthesis.cancel();
-    const mode = document.getElementById('speed-select').value;
+    clearWordTimeouts();
+
     const text = phrases[currentIndex].en;
+    const usVoice = getBestVoice();
 
-    const voices = window.speechSynthesis.getVoices();
-    const usVoice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
-
-    if (mode === 'word-by-word') {
-        // Fala palavra por palavra com pausa nítida entre elas
+    if (currentSpeed === 'word-by-word') {
         const words = text.split(' ');
         let delay = 0;
 
         words.forEach((word) => {
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.6; // velocidade tranquila
+                utterance.rate = 0.65;
                 if (usVoice) utterance.voice = usVoice;
                 window.speechSynthesis.speak(utterance);
             }, delay);
-            delay += 750; // Pausa de 0.75s entre cada palavra
+
+            wordTimeouts.push(timeout);
+            delay += 900;
         });
     } else {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
-        utterance.rate = parseFloat(mode);
+        utterance.rate = parseFloat(currentSpeed);
         if (usVoice) utterance.voice = usVoice;
         window.speechSynthesis.speak(utterance);
     }
