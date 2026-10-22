@@ -1,246 +1,347 @@
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Treino de Fala em Inglês</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { font-family: system-ui, -apple-system, sans-serif; }
-    .pulse-mic { animation: pulse 1.5s infinite; }
-    @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treino de Inglês - Prática Oral</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .counter {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .phrase-en {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4da6ff;
+            margin-bottom: 8px;
+        }
+        .phrase-phonetic {
+            font-size: 1.1rem;
+            color: #ffca28;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+        .phrase-pt {
+            font-size: 1rem;
+            color: #bbb;
+            margin-bottom: 25px;
+        }
+        .btn {
+            background-color: #2b2b2b;
+            color: white;
+            border: 2px solid #444;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 8px 4px;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #3d3d3d;
+            border-color: #666;
+        }
+        .btn-mic {
+            background-color: #2e7d32;
+            border-color: #4caf50;
+            font-weight: bold;
+        }
+        .btn-mic.listening {
+            background-color: #c62828;
+            border-color: #ef5350;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .nav-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .nav-btns .btn {
+            width: 48%;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        .success {
+            background-color: #1b5e20;
+            color: #81c784;
+        }
+        .error {
+            background-color: #b71c1c;
+            color: #e57373;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between p-4 max-w-md mx-auto">
+<body>
 
-  <!-- Topo -->
-  <header class="text-center py-2 border-b border-slate-800">
-    <h1 class="text-lg font-bold text-blue-400 flex items-center justify-center gap-2">
-      <i class="fa-solid fa-graduation-cap"></i> Treino de Escuta e Fala
-    </h1>
-  </header>
+<div class="card">
+    <div class="counter" id="counter">Frase 1 de 100</div>
+    <div class="phrase-en" id="phrase-en">...</div>
+    <div class="phrase-phonetic" id="phrase-phonetic">...</div>
+    <div class="phrase-pt" id="phrase-pt">...</div>
 
-  <!-- Cartão de Exercício -->
-  <main class="my-auto space-y-4">
-    
-    <!-- Ícone de Feedback -->
-    <div id="statusIcon" class="text-center my-2">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800 text-4xl shadow-lg border border-slate-700">
-        🔊
-      </div>
+    <button class="btn" onclick="speakPhrase()">🔊 Ouvir Pronúncia (Lenta)</button>
+    <button class="btn btn-mic" id="btn-mic" onclick="toggleListening()">🎙️ Falar Agora</button>
+
+    <div class="nav-btns">
+        <button class="btn" onclick="prevPhrase()">⬅️ Anterior</button>
+        <button class="btn" onclick="nextPhrase()">Próxima ➡️</button>
     </div>
 
-    <!-- Caixa da Frase -->
-    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 text-center">
-      
-      <!-- Frase em Inglês -->
-      <div>
-        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Frase em Inglês:</span>
-        <h2 id="txtIngles" class="text-2xl font-black text-white mt-1">I'm fine, thanks.</h2>
-      </div>
+    <div class="result" id="result"></div>
+</div>
 
-      <!-- Pronúncia Facilitada -->
-      <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/50">
-        <span class="text-xs font-bold text-emerald-400 uppercase">Pronúncia Facilitada (Leia assim):</span>
-        <p id="txtFonetica" class="text-lg font-bold text-emerald-300 mt-0.5">"Áim fáin, thénks."</p>
-      </div>
+<script>
+const phrases = [
+    // 1 a 10: Cumprimentos e Conversa Inicial
+    { en: "How is it going?", phonetic: "Ráu íz it góuin?", pt: "Como vão as coisas?" },
+    { en: "What have you been up to?", phonetic: "Uát révv iu bín áp tu?", pt: "O que você tem feito de bom?" },
+    { en: "Long time no see!", phonetic: "Lóng táim nóu sí!", pt: "Quanto tempo a gente não se vê!" },
+    { en: "Pretty good, thanks!", phonetic: "Príti gúd, tÉnks!", pt: "Muito bem, obrigado!" },
+    { en: "Can't complain.", phonetic: "Kênt kôm-pléin.", pt: "Não posso me queixar." },
+    { en: "Same as usual.", phonetic: "Séim êz iú-jiu-al.", pt: "Tudo na mesma." },
+    { en: "Not much, you?", phonetic: "Nót mátch, iú?", pt: "Nada demais, e você?" },
+    { en: "How do you know?", phonetic: "Ráu dú iu nóu?", pt: "Como você sabe?" },
+    { en: "That makes sense.", phonetic: "Đêt méiks sêns.", pt: "Faz sentido." },
+    { en: "I see what you mean.", phonetic: "Ái sí uát iu mín.", pt: "Entendi o que você quer dizer." },
 
-      <!-- Tradução -->
-      <div>
-        <span class="text-xs font-bold text-slate-400 uppercase">Tradução:</span>
-        <p id="txtTraducao" class="text-sm font-medium text-slate-300">Eu estou bem, obrigado.</p>
-      </div>
+    // 11 a 20: Opinião e Expressões
+    { en: "To be honest...", phonetic: "Tu bí ónêst...", pt: "Para ser sincero..." },
+    { en: "In my opinion...", phonetic: "Ín mái ô-pí-niôn...", pt: "Na minha opinião..." },
+    { en: "If you ask me...", phonetic: "Íf iu êsk mí...", pt: "Se você quer saber..." },
+    { en: "I'm not really sure.", phonetic: "Áim nót rí-li shúr.", pt: "Não tenho muita certeza." },
+    { en: "It depends.", phonetic: "Ít dí-pêndz.", pt: "Depende." },
+    { en: "I have no idea.", phonetic: "Ái rév nóu ái-día.", pt: "Não faço a menor ideia." },
+    { en: "That sounds great!", phonetic: "Đêt sáundz gréit!", pt: "Parece ótimo!" },
+    { en: "Never mind.", phonetic: "Né-ver máind.", pt: "Deixa para lá / Esquece." },
+    { en: "No worries!", phonetic: "Nóu uó-rîs!", pt: "Sem problemas!" },
+    { en: "It's up to you.", phonetic: "Íts áp tu iú.", pt: "Você quem sabe." },
 
-      <!-- Botão para Ouvir o App Falar -->
-      <button onclick="falarFraseAtual()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl shadow flex items-center justify-center gap-2 transition-all">
-        <i class="fa-solid fa-volume-high text-lg"></i> Ouvir o Aplicativo Falar
-      </button>
+    // 21 a 30: Pedindo Ajuda
+    { en: "Could you help me out?", phonetic: "Kúd iu rélp mí áut?", pt: "Você poderia me dar uma ajuda?" },
+    { en: "What do you mean?", phonetic: "Uát dú iu mín?", pt: "O que você quer dizer?" },
+    { en: "Could you repeat that?", phonetic: "Kúd iu rí-pít đêt?", pt: "Poderia repetir isso?" },
+    { en: "Can you speak slower?", phonetic: "Kên iu spík slóu-er?", pt: "Pode falar mais devagar?" },
+    { en: "How do I get there?", phonetic: "Ráu dú ái gét đêr?", pt: "Como eu chego lá?" },
+    { en: "Where are you headed?", phonetic: "Uêr ár iu ré-dêd?", pt: "Para onde você está indo?" },
+    { en: "Hold on a second.", phonetic: "Róuld ón ê sé-kônd.", pt: "Espera um segundo." },
+    { en: "Give me a hand.", phonetic: "Gív mí ê rênd.", pt: "Me dá uma mãozinha." },
+    { en: "What's going on?", phonetic: "Uáts góuin ón?", pt: "O que está acontecendo?" },
+    { en: "Are you free today?", phonetic: "Ár iu frí tu-déi?", pt: "Você está livre hoje?" },
 
-    </div>
+    // 31 a 40: Rotina e Ações
+    { en: "I'm on my way.", phonetic: "Áim ón mái uéi.", pt: "Estou a caminho." },
+    { en: "I'll be right back.", phonetic: "Áil bí ráit bêk.", pt: "Já volto." },
+    { en: "Take your time.", phonetic: "Téik iór táim.", pt: "Sem pressa." },
+    { en: "I need some sleep.", phonetic: "Ái níd sóm slíp.", pt: "Preciso dormir um pouco." },
+    { en: "Let's call it a day.", phonetic: "Lêts kól ít ê déi.", pt: "Vamos encerrar por hoje." },
+    { en: "I'm running late.", phonetic: "Áim râ-nin léit.", pt: "Estou atrasado." },
+    { en: "Check this out!", phonetic: "Tchêk đís áut!", pt: "Olha só isso!" },
+    { en: "I gotta go now.", phonetic: "Ái gó-ta góu náu.", pt: "Tenho que ir agora." },
+    { en: "Catch you later!", phonetic: "Kêtch iu léi-ter!", pt: "Te vejo mais tarde!" },
+    { en: "Have a good one!", phonetic: "Rév ê gúd uân!", pt: "Tenha um ótimo dia!" },
 
-    <!-- Resultado / Feedback -->
-    <div id="feedbackBox" class="hidden p-4 rounded-xl text-center space-y-1 transition-all">
-      <p id="feedbackTitle" class="font-bold text-lg"></p>
-      <p id="feedbackMsg" class="text-xs opacity-90"></p>
-    </div>
+    // 41 a 50: Reações Naturais
+    { en: "Are you kidding me?", phonetic: "Ár iu kí-din mí?", pt: "Tá de brincadeira comigo?" },
+    { en: "You've got to be kidding!", phonetic: "Iúvv gót tu bí kí-din!", pt: "Só pode ser piada!" },
+    { en: "That's awesome!", phonetic: "Đêts ó-sôm!", pt: "Isso é incrível!" },
+    { en: "I appreciate it.", phonetic: "Ái ê-prí-shi-eit ít.", pt: "Muito obrigado / Agradeço." },
+    { en: "By the way...", phonetic: "Bái đê uéi...", pt: "A propósito..." },
+    { en: "Anyway...", phonetic: "É-ni-uéi...", pt: "Enfim..." },
+    { en: "No way!", phonetic: "Nóu uéi!", pt: "De jeito nenhum!" },
+    { en: "I agree with you.", phonetic: "Ái ê-grí uíđ iu.", pt: "Concordo com você." },
+    { en: "That's pretty cool.", phonetic: "Đêts blí-ti kúl.", pt: "Bem legal isso." },
+    { en: "Keep up the good work!", phonetic: "Kíp áp đê gúd uôrk!", pt: "Continue com o ótimo trabalho!" },
 
-    <!-- Botão do Microfone para Repetir -->
-    <div class="text-center pt-2">
-      <button id="btnMic" onclick="alternarGravacao()" class="w-20 h-20 bg-emerald-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto hover:bg-emerald-500 active:scale-95 transition-all">
-        <i class="fa-solid fa-microphone"></i>
-      </button>
-      <p id="micStatus" class="text-xs text-slate-400 mt-2 font-medium">Ouça o app e toque no microfone para repetir!</p>
-    </div>
+    // 51 a 60: Tomando Decisões
+    { en: "Let me think about it.", phonetic: "Lêt mí tÉnk ê-báut ít.", pt: "Deixa eu pensar nisso." },
+    { en: "I'll let you know.", phonetic: "Áil lêt iu nóu.", pt: "Eu te aviso." },
+    { en: "Make up your mind.", phonetic: "Méik áp iór máind.", pt: "Decida-se." },
+    { en: "It's not worth it.", phonetic: "Íts nót uôrt ít.", pt: "Não vale a pena." },
+    { en: "Forget about it.", phonetic: "Fôr-gét ê-báut ít.", pt: "Esqueça isso." },
+    { en: "That's a good point.", phonetic: "Đêts ê gúd póint.", pt: "Bem lembrado / Bom ponto." },
+    { en: "I couldn't agree more.", phonetic: "Ái kúdnt ê-grí mór.", pt: "Concordo totalmente." },
+    { en: "Are you sure about that?", phonetic: "Ár iu shúr ê-báut đêt?", pt: "Tem certeza disso?" },
+    { en: "Let's give it a try.", phonetic: "Lêts gív ít ê trái.", pt: "Vamos tentar." },
+    { en: "Better late than never.", phonetic: "Bé-ter léit đên né-ver.", pt: "Antes tarde do que nunca." },
 
-  </main>
+    // 61 a 70: Sentimentos e Estados
+    { en: "I'm exhausted.", phonetic: "Áim êg-zós-têd.", pt: "Estou exausto." },
+    { en: "I'm starving!", phonetic: "Áim stár-vin!", pt: "Estou morrendo de fome!" },
+    { en: "I feel sick.", phonetic: "Ái fíl sík.", pt: "Estou me sentindo mal." },
+    { en: "I'm looking forward to it.", phonetic: "Áim lú-kin fór-uârd tu ít.", pt: "Estou ansioso por isso." },
+    { en: "Don't worry about it.", phonetic: "Dóunt uó-ri ê-báut ít.", pt: "Não se preocupe com isso." },
+    { en: "Take it easy.", phonetic: "Téik ít í-zi.", pt: "Vá com calma / Relaxe." },
+    { en: "Calm down.", phonetic: "Kám dáun.", pt: "Calma / Acalme-se." },
+    { en: "I'm so proud of you.", phonetic: "Áim sóu práud óvv iu.", pt: "Tenho tanto orgulho de você." },
+    { en: "I lost my train of thought.", phonetic: "Ái lóst mái tréin óvv tót.", pt: "Perdi o fio da meada." },
+    { en: "I'm in a hurry.", phonetic: "Áim ín ê rê-ri.", pt: "Estou com pressa." },
 
-  <!-- Rodapé / Navegação -->
-  <footer class="flex justify-between items-center border-t border-slate-800 pt-3 text-xs text-slate-400">
-    <button onclick="fraseAnterior()" class="px-3 py-1.5 bg-slate-800 rounded-lg hover:bg-slate-700">
-      <i class="fa-solid fa-chevron-left"></i> Anterior
-    </button>
-    <span id="txtPasso">Frase 1 de 6</span>
-    <button onclick="proximaFrase()" class="px-3 py-1.5 bg-slate-800 rounded-lg hover:bg-slate-700">
-      Próxima <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  </footer>
+    // 71 a 80: Trabalho e Compromissos
+    { en: "I have a lot on my plate.", phonetic: "Ái rév ê lót ón mái pléit.", pt: "Estou cheio de coisas para fazer." },
+    { en: "Can we reschedule?", phonetic: "Kên uí rí-ské-jiul?", pt: "Podemos remarcar?" },
+    { en: "I'll handle it.", phonetic: "Áil rên-dôl ít.", pt: "Eu cuido disso." },
+    { en: "Keep me posted.", phonetic: "Kíp mí póus-têd.", pt: "Mantenha-me informado." },
+    { en: "So far, so good.", phonetic: "Sóu fár, sóu gúd.", pt: "Até agora, tudo bem." },
+    { en: "Back to square one.", phonetic: "Bêk tu skuêr uân.", pt: "De volta ao zero." },
+    { en: "It's a piece of cake.", phonetic: "Íts ê pís óvv kéik.", pt: "É mamão com açúcar / Muito fácil." },
+    { en: "Out of the blue.", phonetic: "Áut óvv đê blú.", pt: "Do nada / De surpresa." },
+    { en: "I'll do my best.", phonetic: "Áil dú mái bêst.", pt: "Farei o meu melhor." },
+    { en: "Let's get down to business.", phonetic: "Lêts gét dáun tu bí-znês.", pt: "Vamos ao que interessa." },
 
-  <script>
-    const listaFrases = [
-      { en: "I'm fine, thanks", fon: "Áim fáin, thénks", pt: "Eu estou bem, obrigado" },
-      { en: "How are you?", fon: "Ráu ár iú?", pt: "Como você está?" },
-      { en: "Nice to meet you", fon: "Náis tu mít iú", pt: "Prazer em conhecê-lo" },
-      { en: "Where is the bathroom?", fon: "Uér iz dâ báth-rum?", pt: "Onde fica o banheiro?" },
-      { en: "Can you help me?", fon: "Kén iú rélp mí?", pt: "Pode me ajudar?" },
-      { en: "Have a nice day", fon: "Rév ê náis déi", pt: "Tenha um bom dia" }
-    ];
+    // 81 a 90: Conversas de Telefone e Mensagens
+    { en: "Can you hear me well?", phonetic: "Kên iu rír mí uél?", pt: "Você consegue me ouvir bem?" },
+    { en: "Your voice is breaking up.", phonetic: "Iór vóis íz bréi-kin áp.", pt: "Sua voz está cortando." },
+    { en: "Call me back later.", phonetic: "Kól mí bêk léi-ter.", pt: "Me liga de volta mais tarde." },
+    { en: "Text me when you get there.", phonetic: "Têkst mí uên iu gét đêr.", pt: "Me manda mensagem quando chegar." },
+    { en: "I missed your call.", phonetic: "Ái mís-t iór kól.", pt: "Perdi sua chamada." },
+    { en: "Drop me a line.", phonetic: "Dróp mí ê láin.", pt: "Me manda uma mensagem." },
+    { en: "I'll call you right back.", phonetic: "Áil kól iu ráit bêk.", pt: "Já te ligo de volta." },
+    { en: "My battery is low.", phonetic: "Mái bê-tê-ri íz lóu.", pt: "Minha bateria está fraca." },
+    { en: "Thanks for calling.", phonetic: "TÉnks fór kó-lin.", pt: "Obrigado por ligar." },
+    { en: "Talk to you soon!", phonetic: "Tók tu iu sún!", pt: "Falo com você em breve!" },
 
-    let indiceAtual = 0;
-    let gravando = false;
-    let recognizer = null;
+    // 91 a 100: Encerramento e Frases Úteis
+    { en: "It was nice talking to you.", phonetic: "Ít uôz náis tó-kin tu iu.", pt: "Foi bom conversar com você." },
+    { en: "Same here!", phonetic: "Séim rír!", pt: "Igualmente!" },
+    { en: "Have a safe trip!", phonetic: "Rév ê séif tríp!", pt: "Boa viagem!" },
+    { en: "Enjoy your meal!", phonetic: "Ín-jói iór míol!", pt: "Bom apetite!" },
+    { en: "Make yourself at home.", phonetic: "Méik ior-sélfêt róum.", pt: "Sinta-se em casa." },
+    { en: "Cross your fingers!", phonetic: "Krós iór fín-gêrz!", pt: "Torça por mim / Dedos cruzados!" },
+    { en: "Time flies!", phonetic: "Táim fláis!", pt: "O tempo voa!" },
+    { en: "Better safe than sorry.", phonetic: "Bé-ter séif đên só-ri.", pt: "É melhor prevenir do que remediar." },
+    { en: "Practice makes perfect.", phonetic: "Prêk-tís méiks pûr-fêkt.", pt: "A prática leva à perfeição." },
+    { en: "You can do it!", phonetic: "Iú kên dú ít!", pt: "Você consegue!" }
+];
 
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognizer = new SpeechRecognition();
-      recognizer.lang = 'en-US';
-      recognizer.continuous = false;
-      recognizer.interimResults = false;
+let currentIndex = 0;
+let recognition = null;
 
-      recognizer.onresult = function(event) {
-        const textoOuvido = event.results[0][0].transcript;
-        validarPronuncia(textoOuvido);
-      };
+function loadPhrase() {
+    const item = phrases[currentIndex];
+    document.getElementById('counter').innerText = `Frase ${currentIndex + 1} de ${phrases.length}`;
+    document.getElementById('phrase-en').innerText = item.en;
+    document.getElementById('phrase-phonetic').innerText = item.phonetic;
+    document.getElementById('phrase-pt').innerText = item.pt;
+    document.getElementById('result').style.display = 'none';
+}
 
-      recognizer.onerror = function() {
-        mostrarFeedback(false, "Não consegui ouvir bem. Tente falar novamente mais perto do microfone.");
-        pararMicVisual();
-      };
+function speakPhrase() {
+    window.speechSynthesis.cancel();
+    const text = phrases[currentIndex].en;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.85; // Velocidade mais devagar para pronúncia limpa
 
-      recognizer.onend = function() {
-        pararMicVisual();
-      };
+    const voices = window.speechSynthesis.getVoices();
+    const usVoice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
+    if (usVoice) {
+        utterance.voice = usVoice;
     }
 
-    function atualizarTela() {
-      const item = listaFrases[indiceAtual];
-      document.getElementById('txtIngles').innerText = item.en;
-      document.getElementById('txtFonetica').innerText = `"${item.fon}"`;
-      document.getElementById('txtTraducao').innerText = item.pt;
-      document.getElementById('txtPasso').innerText = `Frase ${indiceAtual + 1} de ${listaFrases.length}`;
-      
-      document.getElementById('statusIcon').innerHTML = `
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800 text-4xl shadow-lg border border-slate-700">🔊</div>
-      `;
-      document.getElementById('feedbackBox').classList.add('hidden');
-    }
+    window.speechSynthesis.speak(utterance);
+}
 
-    function falarFraseAtual() {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(listaFrases[indiceAtual].en);
-      u.lang = 'en-US';
-      u.rate = 0.85;
-      window.speechSynthesis.speak(u);
+function nextPhrase() {
+    if (currentIndex < phrases.length - 1) {
+        currentIndex++;
+        loadPhrase();
     }
+}
 
-    function alternarGravacao() {
-      if (!recognizer) {
-        alert("O seu navegador não suporta reconhecimento de voz direto. Abra o link no Google Chrome.");
+function prevPhrase() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        loadPhrase();
+    }
+}
+
+function initSpeech() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Seu navegador não suporta reconhecimento de voz. Recomendamos o Google Chrome.");
         return;
-      }
-
-      if (gravando) {
-        recognizer.stop();
-        pararMicVisual();
-      } else {
-        window.speechSynthesis.cancel();
-        recognizer.start();
-        gravando = true;
-        const btn = document.getElementById('btnMic');
-        btn.className = "w-20 h-20 bg-red-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto pulse-mic";
-        document.getElementById('micStatus').innerText = "Sua vez! Fale em Inglês agora...";
-      }
     }
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
 
-    function pararMicVisual() {
-      gravando = false;
-      const btn = document.getElementById('btnMic');
-      btn.className = "w-20 h-20 bg-emerald-600 text-white rounded-full text-2xl font-bold shadow-lg flex items-center justify-center mx-auto hover:bg-emerald-500";
-      document.getElementById('micStatus').innerText = "Ouça o app e toque no microfone para repetir!";
-    }
+    recognition.onstart = () => {
+        const btn = document.getElementById('btn-mic');
+        btn.classList.add('listening');
+        btn.innerText = "🎙️ Ouvindo... Fale agora!";
+    };
 
-    function limparTexto(txt) {
-      return txt.toLowerCase().replace(/[^a-z0-9]/g, '');
-    }
+    recognition.onend = () => {
+        const btn = document.getElementById('btn-mic');
+        btn.classList.remove('listening');
+        btn.innerText = "🎙️ Falar Agora";
+    };
 
-    function validarPronuncia(falado) {
-      const esperado = listaFrases[indiceAtual].en;
-      const fL = limparTexto(falado);
-      const eL = limparTexto(esperado);
-
-      if (fL === eL || fL.includes(eL) || eL.includes(fL)) {
-        // ACERTO (✔️)
-        document.getElementById('statusIcon').innerHTML = `
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 text-5xl shadow-lg animate-bounce">
-            ✔️
-          </div>
-        `;
-        mostrarFeedback(true, `Perfeito! Você disse exatamente: "${falado}". Passando para a próxima...`);
+    recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript.toLowerCase().replace(/[.,?!]/g, '');
+        const targetText = phrases[currentIndex].en.toLowerCase().replace(/[.,?!]/g, '');
         
-        setTimeout(() => {
-          proximaFrase();
-        }, 2200);
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
 
-      } else {
-        // ERRO (❌ / DICA)
-        document.getElementById('statusIcon').innerHTML = `
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-500 text-amber-400 text-5xl shadow-lg">
-            ❌
-          </div>
-        `;
-        mostrarFeedback(false, `Eu ouvi "${falado}". Tente repetir seguindo o som: "${listaFrases[indiceAtual].fon}".`);
-      }
-    }
+        if (spokenText === targetText || targetText.includes(spokenText)) {
+            resultDiv.className = 'result success';
+            resultDiv.innerText = `✔️ Perfeito! Você disse: "${event.results[0][0].transcript}"`;
+        } else {
+            resultDiv.className = 'result error';
+            resultDiv.innerText = `❌ Você falou: "${event.results[0][0].transcript}". Tente novamente!`;
+        }
+    };
+}
 
-    function mostrarFeedback(sucesso, mensagem) {
-      const box = document.getElementById('feedbackBox');
-      const title = document.getElementById('feedbackTitle');
-      const msg = document.getElementById('feedbackMsg');
+function toggleListening() {
+    if (!recognition) initSpeech();
+    if (recognition) recognition.start();
+}
 
-      box.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-200', 'border-emerald-700', 'bg-amber-950', 'text-amber-200', 'border-amber-700');
-      
-      if (sucesso) {
-        box.classList.add('bg-emerald-950', 'text-emerald-200', 'border', 'border-emerald-700');
-        title.innerText = "✨ Mandou bem!";
-      } else {
-        box.classList.add('bg-amber-950', 'text-amber-200', 'border', 'border-amber-700');
-        title.innerText = "💡 Tente de novo!";
-      }
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
 
-      msg.innerText = mensagem;
-    }
+loadPhrase();
+</script>
 
-    function proximaFrase() {
-      if (indiceAtual < listaFrases.length - 1) {
-        indiceAtual++;
-      } else {
-        indiceAtual = 0;
-      }
-      atualizarTela();
-    }
-
-    function fraseAnterior() {
-      if (indiceAtual > 0) {
-        indiceAtual--;
-        atualizarTela();
-      }
-    }
-
-    window.onload = atualizarTela;
-  </script>
 </body>
 </html>
