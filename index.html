@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Treino de Inglês - Prática Oral</title>
+    <title>Treino de Inglês - Prática Oral & Palácio da Memória</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -29,7 +29,7 @@
         .counter {
             font-size: 0.9rem;
             color: #888;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -43,13 +43,46 @@
             font-size: 1.1rem;
             color: #ffca28;
             font-style: italic;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .phrase-pt {
             font-size: 1rem;
             color: #bbb;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
+
+        /* BLOCO DO PALÁCIO DA MEMÓRIA */
+        .memory-palace-box {
+            background: linear-gradient(135deg, #1f2a38 0%, #161d26 100%);
+            border: 1px solid #3a4b61;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .memory-palace-header {
+            font-size: 0.8rem;
+            color: #4da6ff;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .memory-location {
+            font-size: 0.95rem;
+            color: #ffca28;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .memory-scene {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            line-height: 1.4;
+        }
+
         .btn {
             background-color: #2b2b2b;
             color: white;
@@ -159,6 +192,13 @@
     <div class="phrase-phonetic" id="phrase-phonetic">...</div>
     <div class="phrase-pt" id="phrase-pt">...</div>
 
+    <!-- Bloco de Mnemônica e Palácio da Memória -->
+    <div class="memory-palace-box">
+        <div class="memory-palace-header">🧠 Palácio da Memória | Gatilho Visual</div>
+        <div class="memory-location" id="memory-location">...</div>
+        <div class="memory-scene" id="memory-scene">...</div>
+    </div>
+
     <button class="btn btn-speed" onclick="openModal()">⚙️ Velocidade: <span id="current-speed-label">Super Lenta</span></button>
     <button class="btn" onclick="speakPhraseTwice()">🔊 Ouvir Pronúncia (2x)</button>
     <button class="btn btn-mic" id="btn-mic" onclick="toggleListening()">🎙️ Falar Agora</button>
@@ -184,124 +224,119 @@
 <script>
 const phrases = [
     // 1 a 10: Cumprimentos e Conversa Inicial
-    { en: "How is it going?", phonetic: "Ráu íz it góuin?", pt: "Como vão as coisas?" },
-    { en: "What have you been up to?", phonetic: "Uát révv iu bín áp tu?", pt: "O que você tem feito de bom?" },
-    { en: "Long time no see!", phonetic: "Lóng táim nóu sí!", pt: "Quanto tempo a gente não se vê!" },
-    { en: "Pretty good, thanks!", phonetic: "Príti gúd, tÉnks!", pt: "Muito bem, obrigado!" },
-    { en: "Can't complain.", phonetic: "Kênt kôm-pléin.", pt: "Não posso me queixar." },
-    { en: "Same as usual.", phonetic: "Séim êz iú-jiu-al.", pt: "Tudo na mesma." },
-    { en: "Not much, you?", phonetic: "Nót mátch, iú?", pt: "Nada demais, e você?" },
-    { en: "How do you know?", phonetic: "Ráu dú iu nóu?", pt: "Como você sabe?" },
-    { en: "That makes sense.", phonetic: "Đêt méiks sêns.", pt: "Faz sentido." },
-    { en: "I see what you mean.", phonetic: "Ái sí uát iu mín.", pt: "Entendi o que você quer dizer." },
+    { en: "How is it going?", phonetic: "Ráu íz it góuin?", pt: "Como vão as coisas?", location: "📍 Estação 1: Porta de Entrada", scene: "Mentalize a <b>Áurea</b> na porta de entrada pegando um <b>gole</b> de café e <b>indo</b> embora correndo." },
+    { en: "What have you been up to?", phonetic: "Uát révv iu bín áp tu?", pt: "O que você tem feito de bom?", location: "📍 Estação 2: Sala de Estar", scene: "Gatilho: Veja um <b>Uat</b>er (Garçom) com o <b>Apt</b>o em cima do sofá te perguntando o que você fez." },
+    { en: "Long time no see!", phonetic: "Lóng táim nóu sí!", pt: "Quanto tempo a gente não se vê!", location: "📍 Estação 3: Corredor", scene: "Gatilho: Um dragão <b>Longo</b> e um <b>Time</b> sem ver ninguém no escuro do corredor." },
+    { en: "Pretty good, thanks!", phonetic: "Príti gúd, tÉnks!", pt: "Muito bem, obrigado!", location: "📍 Estação 4: Cozinha", scene: "Gatilho: Uma pessoa <b>Príti</b> (Preta/Bonita) segurando uma comida muito <b>Gúd</b> na mesa da cozinha." },
+    { en: "Can't complain.", phonetic: "Kênt kôm-pléin.", pt: "Não posso me queixar.", location: "📍 Estação 5: Varanda", scene: "Gatilho: Alguém segurando uma <b>Canta</b> de refrigerante e um <b>Complo</b> na varanda sem reclamar." },
+    { en: "Same as usual.", phonetic: "Séim êz iú-jiu-al.", pt: "Tudo na mesma.", location: "📍 Estação 6: Banheiro", scene: "Gatilho: O <b>Sem</b>afóro funcionando do mesmo jeito de sempre em cima da pia." },
+    { en: "Not much, you?", phonetic: "Nót mátch, iú?", pt: "Nada demais, e você?", location: "📍 Estação 7: Quarto Principal", scene: "Gatilho: Um <b>Nota</b> de dinheiro e um <b>Match</b> de fósforo em cima da cama." },
+    { en: "How do you know?", phonetic: "Ráu dú iu nóu?", pt: "Como você sabe?", location: "📍 Estação 8: Escritório", scene: "Gatilho: Uma pessoa perguntando <b>Ráu</b> (Rao) enquanto dá um nó (<b>Nóu</b>) numa corda." },
+    { en: "That makes sense.", phonetic: "Đêt méiks sêns.", pt: "Faz sentido.", location: "📍 Estação 9: Garagem", scene: "Gatilho: Alguém fazendo uma <b>Meica</b> (Maquiagem) com <b>Censo</b> no carro." },
+    { en: "I see what you mean.", phonetic: "Ái sí uát iu mín.", pt: "Entendi o que você quer dizer.", location: "📍 Estação 10: Portão Principal", scene: "Gatilho: Você vendo (<b>Sí</b>) uma mina (<b>Mín</b>) passando pelo portão." },
 
     // 11 a 20: Opinião e Expressões
-    { en: "To be honest...", phonetic: "Tu bí ónêst...", pt: "Para ser sincero..." },
-    { en: "In my opinion...", phonetic: "Ín mái ô-pí-niôn...", pt: "Na minha opinião..." },
-    { en: "If you ask me...", phonetic: "Íf iu êsk mí...", pt: "Se você quer saber..." },
-    { en: "I'm not really sure.", phonetic: "Áim nót rí-li shúr.", pt: "Não tenho muita certeza." },
-    { en: "It depends.", phonetic: "Ít dí-pêndz.", pt: "Depende." },
-    { en: "I have no idea.", phonetic: "Ái rév nóu ái-día.", pt: "Não faço a menor ideia." },
-    { en: "That sounds great!", phonetic: "Đêt sáundz gréit!", pt: "Parece ótimo!" },
-    { en: "Never mind.", phonetic: "Né-ver máind.", pt: "Deixa para lá / Esquece." },
-    { en: "No worries!", phonetic: "Nóu uó-rîs!", pt: "Sem problemas!" },
-    { en: "It's up to you.", phonetic: "Íts áp tu iú.", pt: "Você quem sabe." },
-
-    // 21 a 30: Pedindo Ajuda
-    { en: "Could you help me out?", phonetic: "Kúd iu rélp mí áut?", pt: "Você poderia me dar uma ajuda?" },
-    { en: "What do you mean?", phonetic: "Uát dú iu mín?", pt: "O que você quer dizer?" },
-    { en: "Could you repeat that?", phonetic: "Kúd iu rí-pít đêt?", pt: "Poderia repetir isso?" },
-    { en: "Can you speak slower?", phonetic: "Kên iu spík slóu-er?", pt: "Pode falar mais devagar?" },
-    { en: "How do I get there?", phonetic: "Ráu dú ái gét đêr?", pt: "Como eu chego lá?" },
-    { en: "Where are you headed?", phonetic: "Uêr ár iu ré-dêd?", pt: "Para onde você está indo?" },
-    { en: "Hold on a second.", phonetic: "Róuld ón ê sé-kônd.", pt: "Espera um segundo." },
-    { en: "Give me a hand.", phonetic: "Gív mí ê rênd.", pt: "Me dá uma mãozinha." },
-    { en: "What's going on?", phonetic: "Uáts góuin ón?", pt: "O que está acontecendo?" },
-    { en: "Are you free today?", phonetic: "Ár iu frí tu-déi?", pt: "Você está livre hoje?" },
+    { en: "To be honest...", phonetic: "Tu bí ónêst...", pt: "Para ser sincero...", location: "📍 Estação 11: Jardim", scene: "Gatilho: Uma abelha (<b>Bí</b>) sendo honesta colhendo flor no jardim." },
+    { en: "In my opinion...", phonetic: "Ín mái ô-pí-niôn...", pt: "Na minha opinião...", location: "📍 Estação 12: Sacada", scene: "Gatilho: Uma <b>Opinião</b> escrita em letras gigantes pendurada na sacada." },
+    { en: "If you ask me...", phonetic: "Íf iu êsk mí...", pt: "Se você quer saber...", location: "📍 Estação 13: Lavanderia", scene: "Gatilho: Alguém te fazendo uma pergunta enquanto usa o <b>Ésk</b> (esfregão)." },
+    { en: "I'm not really sure.", phonetic: "Áim nót rí-li shúr.", pt: "Não tenho muita certeza.", location: "📍 Estação 14: Dispensa", scene: "Gatilho: Um pote de <b>Ríli</b> (refrigerante) que você não tem certeza se está bom." },
+    { en: "It depends.", phonetic: "Íts dí-pêndz.", pt: "Depende.", location: "📍 Estação 15: Escada", scene: "Gatilho: Um pendulo (<b>Dependz</b>) balançando no meio do degrau da escada." },
+    { en: "I have no idea.", phonetic: "Ái rév nóu ái-día.", pt: "Não faço a menor ideia.", location: "📍 Estação 16: Hall de Entrada", scene: "Gatilho: Lâmpada de <b>Ideia</b> acendendo sem ninguém saber o motivo." },
+    { en: "That sounds great!", phonetic: "Đêt sáundz gréit!", pt: "Parece ótimo!", location: "📍 Estação 17: Sala de Jantar", scene: "Gatilho: Um som (<b>Sáundz</b>) de música incrível saindo do prato de jantar." },
+    { en: "Never mind.", phonetic: "Né-ver máind.", pt: "Deixa para lá / Esquece.", location: "📍 Estação 18: Sótão", scene: "Gatilho: Apagando algo da mente (<b>Máind</b>) e jogando no sótão." },
+    { en: "No worries!", phonetic: "Nóu uó-rîs!", pt: "Sem problemas!", location: "📍 Estação 19: Adega", scene: "Gatilho: Garrafas sem nenhuma preocupação (<b>Uó-rîs</b>)." },
+    { en: "It's up to you.", phonetic: "Íts áp tu iú.", pt: "Você quem sabe.", location: "📍 Estação 20: Piscina", scene: "Gatilho: Alguém apontando para cima (<b>Áp</b>) na beira da piscina." },
 
     // 31 a 40: Rotina e Ações
-    { en: "I'm on my way.", phonetic: "Áim ón mái uéi.", pt: "Estou a caminho." },
-    { en: "I'll be right back.", phonetic: "Áil bí ráit bêk.", pt: "Já volto." },
-    { en: "Take your time.", phonetic: "Téik iór táim.", pt: "Sem pressa." },
-    { en: "I need some sleep.", phonetic: "Ái níd sóm slíp.", pt: "Preciso dormir um pouco." },
-    { en: "Let's call it a day.", phonetic: "Lêts kól ít ê déi.", pt: "Vamos encerrar por hoje." },
-    { en: "I'm running late.", phonetic: "Áim râ-nin léit.", pt: "Estou atrasado." },
-    { en: "Check this out!", phonetic: "Tchêk đís áut!", pt: "Olha só isso!" },
-    { en: "I gotta go now.", phonetic: "Ái gó-ta góu náu.", pt: "Tenho que ir agora." },
-    { en: "Catch you later!", phonetic: "Kêtch iu léi-ter!", pt: "Te vejo mais tarde!" },
-    { en: "Have a good one!", phonetic: "Rév ê gúd uân!", pt: "Tenha um ótimo dia!" },
+    { en: "I gotta go now.", phonetic: "Ái gó-ta góu náu.", pt: "Tenho que ir agora.", location: "📍 Estação 38: Saída da Sala", scene: "Gatilho: Um <b>Gato</b> com <b>Gatilho</b> correndo para a saída da sala." },
 
-    // 41 a 50: Reações Naturais
-    { en: "Are you kidding me?", phonetic: "Ár iu kí-din mí?", pt: "Tá de brincadeira comigo?" },
-    { en: "You've got to be kidding!", phonetic: "Iúvv gót tu bí kí-din!", pt: "Só pode ser piada!" },
-    { en: "That's awesome!", phonetic: "Đêts ó-sôm!", pt: "Isso é incrível!" },
-    { en: "I appreciate it.", phonetic: "Ái ê-prí-shi-eit ít.", pt: "Muito obrigado / Agradeço." },
-    { en: "By the way...", phonetic: "Bái đê uéi...", pt: "A propósito..." },
-    { en: "Anyway...", phonetic: "É-ni-uéi...", pt: "Enfim..." },
-    { en: "No way!", phonetic: "Nóu uéi!", pt: "De jeito nenhum!" },
-    { en: "I agree with you.", phonetic: "Ái ê-grí uíđ iu.", pt: "Concordo com você." },
-    { en: "That's pretty cool.", phonetic: "Đêts blí-ti kúl.", pt: "Bem legal isso." },
-    { en: "Keep up the good work!", phonetic: "Kíp áp đê gúd uôrk!", pt: "Continue com o ótimo trabalho!" },
+    // Mantendo todas as outras frases originais ativas no carregamento
+    { en: "Could you help me out?", phonetic: "Kúd iu rélp mí áut?", pt: "Você poderia me dar uma ajuda?", location: "📍 Estação 21", scene: "Gatilho: Alguém pedindo <b>Hélp</b> (ajuda) na porta." },
+    { en: "What do you mean?", phonetic: "Uát dú iu mín?", pt: "O que você quer dizer?", location: "📍 Estação 22", scene: "Gatilho: Uma <b>Mina</b> perguntando o significado de algo." },
+    { en: "Could you repeat that?", phonetic: "Kúd iu rí-pít đêt?", pt: "Poderia repetir isso?", location: "📍 Estação 23", scene: "Gatilho: Um gravador repetindo o áudio no balcão." },
+    { en: "Can you speak slower?", phonetic: "Kên iu spík slóu-er?", pt: "Pode falar mais devagar?", location: "📍 Estação 24", scene: "Gatilho: Um caracol andando bem devagar (<b>Slóu</b>)." },
+    { en: "How do I get there?", phonetic: "Ráu dú ái gét đêr?", pt: "Como eu chego lá?", location: "📍 Estação 25", scene: "Gatilho: Alguém olhando para um mapa." },
+    { en: "Where are you headed?", phonetic: "Uêr ár iu ré-dêd?", pt: "Para onde você está indo?", location: "📍 Estação 26", scene: "Gatilho: Uma pessoa andando em direção à saída." },
+    { en: "Hold on a second.", phonetic: "Róuld ón ê sé-kônd.", pt: "Espera um segundo.", location: "📍 Estação 27", scene: "Gatilho: Segurando um relógio com a mão." },
+    { en: "Give me a hand.", phonetic: "Gív mí ê rênd.", pt: "Me dá uma mãozinha.", location: "📍 Estação 28", scene: "Gatilho: Uma mão gigante saindo da parede." },
+    { en: "What's going on?", phonetic: "Uáts góuin ón?", pt: "O que está acontecendo?", location: "📍 Estação 29", scene: "Gatilho: Pessoas surpresas olhando ao redor." },
+    { en: "Are you free today?", phonetic: "Ár iu frí tu-déi?", pt: "Você está livre hoje?", location: "📍 Estação 30", scene: "Gatilho: Um calendário com o dia de hoje marcado com livre." },
 
-    // 51 a 60: Tomando Decisões
-    { en: "Let me think about it.", phonetic: "Lêt mí tÉnk ê-báut ít.", pt: "Deixa eu pensar nisso." },
-    { en: "I'll let you know.", phonetic: "Áil lêt iu nóu.", pt: "Eu te aviso." },
-    { en: "Make up your mind.", phonetic: "Méik áp iór máind.", pt: "Decida-se." },
-    { en: "It's not worth it.", phonetic: "Íts nót uôrt ít.", pt: "Não vale a pena." },
-    { en: "Forget about it.", phonetic: "Fôr-gét ê-báut ít.", pt: "Esqueça isso." },
-    { en: "That's a good point.", phonetic: "Đêts ê gúd póint.", pt: "Bem lembrado / Bom ponto." },
-    { en: "I couldn't agree more.", phonetic: "Ái kúdnt ê-grí mór.", pt: "Concordo totalmente." },
-    { en: "Are you sure about that?", phonetic: "Ár iu shúr ê-báut đêt?", pt: "Tem certeza disso?" },
-    { en: "Let's give it a try.", phonetic: "Lêts gív ít ê trái.", pt: "Vamos tentar." },
-    { en: "Better late than never.", phonetic: "Bé-ter léit đên né-ver.", pt: "Antes tarde do que nunca." },
+    { en: "I'm on my way.", phonetic: "Áim ón mái uéi.", pt: "Estou a caminho.", location: "📍 Estação 31", scene: "Gatilho: Alguém correndo no meio do caminho." },
+    { en: "I'll be right back.", phonetic: "Áil bí ráit bêk.", pt: "Já volto.", location: "📍 Estação 32", scene: "Gatilho: Uma placa de volta em breve na porta." },
+    { en: "Take your time.", phonetic: "Téik iór táim.", pt: "Sem pressa.", location: "📍 Estação 33", scene: "Gatilho: Um relógio derretendo sem pressa." },
+    { en: "I need some sleep.", phonetic: "Ái níd sóm slíp.", pt: "Preciso dormir um pouco.", location: "📍 Estação 34", scene: "Gatilho: Travesseiro macio piscando para você." },
+    { en: "Let's call it a day.", phonetic: "Lêts kól ít ê déi.", pt: "Vamos encerrar por hoje.", location: "📍 Estação 35", scene: "Gatilho: Fechando a porta e desligando a luz." },
+    { en: "I'm running late.", phonetic: "Áim râ-nin léit.", pt: "Estou atrasado.", location: "📍 Estação 36", scene: "Gatilho: Correndo contra o tempo com o relógio apitando." },
+    { en: "Check this out!", phonetic: "Tchêk đís áut!", pt: "Olha só isso!", location: "📍 Estação 37", scene: "Gatilho: Apontando com uma lanterna para algo incrível." },
+    { en: "Catch you later!", phonetic: "Kêtch iu léi-ter!", pt: "Te vejo mais tarde!", location: "📍 Estação 39", scene: "Gatilho: Acenando um tchau de longe." },
+    { en: "Have a good one!", phonetic: "Rév ê gúd uân!", pt: "Tenha um ótimo dia!", location: "📍 Estação 40", scene: "Gatilho: Um sorriso brilhante na saída." },
 
-    // 61 a 70: Sentimentos e Estados
-    { en: "I'm exhausted.", phonetic: "Áim êg-zós-têd.", pt: "Estou exausto." },
-    { en: "I'm starving!", phonetic: "Áim stár-vin!", pt: "Estou morrendo de fome!" },
-    { en: "I feel sick.", phonetic: "Ái fíl sík.", pt: "Estou me sentindo mal." },
-    { en: "I'm looking forward to it.", phonetic: "Áim lú-kin fór-uârd tu ít.", pt: "Estou ansioso por isso." },
-    { en: "Don't worry about it.", phonetic: "Dóunt uó-ri ê-báut ít.", pt: "Não se preocupe com isso." },
-    { en: "Take it easy.", phonetic: "Téik ít í-zi.", pt: "Vá com calma / Relaxe." },
-    { en: "Calm down.", phonetic: "Kám dáun.", pt: "Calma / Acalme-se." },
-    { en: "I'm so proud of you.", phonetic: "Áim sóu práud óvv iu.", pt: "Tenho tanto orgulho de você." },
-    { en: "I lost my train of thought.", phonetic: "Ái lóst mái tréin óvv tót.", pt: "Perdi o fio da meada." },
-    { en: "I'm in a hurry.", phonetic: "Áim ín ê rê-ri.", pt: "Estou com pressa." },
+    { en: "Are you kidding me?", phonetic: "Ár iu kí-din mí?", pt: "Tá de brincadeira comigo?", location: "📍 Estação 41", scene: "Gatilho: Um palhaço dando risada." },
+    { en: "You've got to be kidding!", phonetic: "Iúvv gót tu bí kí-din!", pt: "Só pode ser piada!", location: "📍 Estação 42", scene: "Gatilho: Alguém rindo sem acreditar." },
+    { en: "That's awesome!", phonetic: "Đêts ó-sôm!", pt: "Isso é incrível!", location: "📍 Estação 43", scene: "Gatilho: Fogos de artifício estourando." },
+    { en: "I appreciate it.", phonetic: "Ái ê-prí-shi-eit ít.", pt: "Muito obrigado / Agradeço.", location: "📍 Estação 44", scene: "Gatilho: Um aperto de mão forte." },
+    { en: "By the way...", phonetic: "Bái đê uéi...", pt: "A propósito...", location: "📍 Estação 45", scene: "Gatilho: Uma seta apontando para o lado do caminho." },
+    { en: "Anyway...", phonetic: "É-ni-uéi...", pt: "Enfim...", location: "📍 Estação 46", scene: "Gatilho: Balançando as mãos para mudar de assunto." },
+    { en: "No way!", phonetic: "Nóu uéi!", pt: "De jeito nenhum!", location: "📍 Estação 47", scene: "Gatilho: Um sinal gigante de proibido." },
+    { en: "I agree with you.", phonetic: "Ái ê-grí uíđ iu.", pt: "Concordo com você.", location: "📍 Estação 48", scene: "Gatilho: Duas pessoas acenando positivamente com a cabeça." },
+    { en: "That's pretty cool.", phonetic: "Đêts blí-ti kúl.", pt: "Bem legal isso.", location: "📍 Estação 49", scene: "Gatilho: Óculos de sol estilosos caindo no rosto." },
+    { en: "Keep up the good work!", phonetic: "Kíp áp đê gúd uôrk!", pt: "Continue com o ótimo trabalho!", location: "📍 Estação 50", scene: "Gatilho: Um troféu brilhando na mesa." },
 
-    // 71 a 80: Trabalho e Compromissos
-    { en: "I have a lot on my plate.", phonetic: "Ái rév ê lót ón mái pléit.", pt: "Estou cheio de coisas para fazer." },
-    { en: "Can we reschedule?", phonetic: "Kên uí rí-ské-jiul?", pt: "Podemos remarcar?" },
-    { en: "I'll handle it.", phonetic: "Áil rên-dôl ít.", pt: "Eu cuido disso." },
-    { en: "Keep me posted.", phonetic: "Kíp mí póus-têd.", pt: "Mantenha-me informado." },
-    { en: "So far, so good.", phonetic: "Sóu fár, sóu gúd.", pt: "Até agora, tudo bem." },
-    { en: "Back to square one.", phonetic: "Bêk tu skuêr uân.", pt: "De volta ao zero." },
-    { en: "It's a piece of cake.", phonetic: "Íts ê pís óvv kéik.", pt: "É mamão com açúcar / Muito fácil." },
-    { en: "Out of the blue.", phonetic: "Áut óvv đê blú.", pt: "Do nada / De surpresa." },
-    { en: "I'll do my best.", phonetic: "Áil dú mái bêst.", pt: "Farei o meu melhor." },
-    { en: "Let's get down to business.", phonetic: "Lêts gét dáun tu bí-znês.", pt: "Vamos ao que interessa." },
+    { en: "Let me think about it.", phonetic: "Lêt mí tÉnk ê-báut ít.", pt: "Deixa eu pensar nisso.", location: "📍 Estação 51", scene: "Gatilho: Uma nuvem de pensamento acima da cabeça." },
+    { en: "I'll let you know.", phonetic: "Áil lêt iu nóu.", pt: "Eu te aviso.", location: "📍 Estação 52", scene: "Gatilho: Enviando uma carta ou mensagem." },
+    { en: "Make up your mind.", phonetic: "Méik áp iór máind.", pt: "Decida-se.", location: "📍 Estação 53", scene: "Gatilho: Uma balança de dois lados equilibrando." },
+    { en: "It's not worth it.", phonetic: "Íts nót uôrt ít.", pt: "Não vale a pena.", location: "📍 Estação 54", scene: "Gatilho: Jogando moedas fora sem valor." },
+    { en: "Forget about it.", phonetic: "Fôr-gét ê-báut ít.", pt: "Esqueça isso.", location: "📍 Estação 55", scene: "Gatilho: Apagador apagando um quadro negro." },
+    { en: "That's a good point.", phonetic: "Đêts ê gúd póint.", pt: "Bem lembrado / Bom ponto.", location: "📍 Estação 56", scene: "Gatilho: Um alvo acertado no centro." },
+    { en: "I couldn't agree more.", phonetic: "Ái kúdnt ê-grí mór.", pt: "Concordo totalmente.", location: "📍 Estação 57", scene: "Gatilho: Dois carimbos de APROVADO." },
+    { en: "Are you sure about that?", phonetic: "Ár iu shúr ê-báut đêt?", pt: "Tem certeza disso?", location: "📍 Estação 58", scene: "Gatilho: Lupa analisando de perto." },
+    { en: "Let's give it a try.", phonetic: "Lêts gív ít ê trái.", pt: "Vamos tentar.", location: "📍 Estação 59", scene: "Gatilho: Apertando um botão verde de START." },
+    { en: "Better late than never.", phonetic: "Bé-ter léit đên né-ver.", pt: "Antes tarde do que nunca.", location: "📍 Estação 60", scene: "Gatilho: Tartaruga cruzando a linha de chegada feliz." },
 
-    // 81 a 90: Conversas de Telefone e Mensagens
-    { en: "Can you hear me well?", phonetic: "Kên iu rír mí uél?", pt: "Você consegue me ouvir bem?" },
-    { en: "Your voice is breaking up.", phonetic: "Iór vóis íz bréi-kin áp.", pt: "Sua voz está cortando." },
-    { en: "Call me back later.", phonetic: "Kól mí bêk léi-ter.", pt: "Me liga de volta mais tarde." },
-    { en: "Text me when you get there.", phonetic: "Têkst mí uên iu gét đêr.", pt: "Me manda mensagem quando chegar." },
-    { en: "I missed your call.", phonetic: "Ái mís-t iór kól.", pt: "Perdi sua chamada." },
-    { en: "Drop me a line.", phonetic: "Dróp mí ê láin.", pt: "Me manda uma mensagem." },
-    { en: "I'll call you right back.", phonetic: "Áil kól iu ráit bêk.", pt: "Já te ligo de volta." },
-    { en: "My battery is low.", phonetic: "Mái bê-tê-ri íz lóu.", pt: "Minha bateria está fraca." },
-    { en: "Thanks for calling.", phonetic: "TÉnks fór kó-lin.", pt: "Obrigado por ligar." },
-    { en: "Talk to you soon!", phonetic: "Tók tu iu sún!", pt: "Falo com você em breve!" },
+    { en: "I'm exhausted.", phonetic: "Áim êg-zós-têd.", pt: "Estou exausto.", location: "📍 Estação 61", scene: "Gatilho: Bateria no 1% piscando." },
+    { en: "I'm starving!", phonetic: "Áim stár-vin!", pt: "Estou morrendo de fome!", location: "📍 Estação 62", scene: "Gatilho: Prato vazio com garfo e faca." },
+    { en: "I feel sick.", phonetic: "Ái fíl sík.", pt: "Estou me sentindo mal.", location: "📍 Estação 63", scene: "Gatilho: Termômetro e copo d'água na mesa." },
+    { en: "I'm looking forward to it.", phonetic: "Áim lú-kin fór-uârd tu ít.", pt: "Estou ansioso por isso.", location: "📍 Estação 64", scene: "Gatilho: Binóculo olhando para o futuro feliz." },
+    { en: "Don't worry about it.", phonetic: "Dóunt uó-ri ê-báut ít.", pt: "Não se preocupe com isso.", location: "📍 Estação 65", scene: "Gatilho: Uma rede de descanso balançando." },
+    { en: "Take it easy.", phonetic: "Téik ít í-zi.", pt: "Vá com calma / Relaxe.", location: "📍 Estação 66", scene: "Gatilho: Alguém meditando tranquilamente." },
+    { en: "Calm down.", phonetic: "Kám dáun.", pt: "Calma / Acalme-se.", location: "📍 Estação 67", scene: "Gatilho: Mão fazendo gesto para baixar a poeira." },
+    { en: "I'm so proud of you.", phonetic: "Áim sóu práud óvv iu.", pt: "Tenho tanto orgulho de você.", location: "📍 Estação 68", scene: "Gatilho: Medalha de ouro no peito." },
+    { en: "I lost my train of thought.", phonetic: "Ái lóst mái tréin óvv tót.", pt: "Perdi o fio da meada.", location: "📍 Estação 69", scene: "Gatilho: Um trem saindo dos trilhos de fumaça." },
+    { en: "I'm in a hurry.", phonetic: "Áim ín ê rê-ri.", pt: "Estou com pressa.", location: "📍 Estação 70", scene: "Gatilho: Alguém correndo com sapato voando." },
 
-    // 91 a 100: Encerramento e Frases Úteis
-    { en: "It was nice talking to you.", phonetic: "Ít uôz náis tó-kin tu iu.", pt: "Foi bom conversar com você." },
-    { en: "Same here!", phonetic: "Séim rír!", pt: "Igualmente!" },
-    { en: "Have a safe trip!", phonetic: "Rév ê séif tríp!", pt: "Boa viagem!" },
-    { en: "Enjoy your meal!", phonetic: "Ín-jói iór míol!", pt: "Bom apetite!" },
-    { en: "Make yourself at home.", phonetic: "Méik ior-sélfêt róum.", pt: "Sinta-se em casa." },
-    { en: "Cross your fingers!", phonetic: "Krós iór fín-gêrz!", pt: "Torça por mim / Dedos cruzados!" },
-    { en: "Time flies!", phonetic: "Táim fláis!", pt: "O tempo voa!" },
-    { en: "Better safe than sorry.", phonetic: "Bé-ter séif đên só-ri.", pt: "É melhor prevenir do que remediar." },
-    { en: "Practice makes perfect.", phonetic: "Prêk-tís méiks pûr-fêkt.", pt: "A prática leva à perfeição." },
-    { en: "You can do it!", phonetic: "Iú kên dú ít!", pt: "Você consegue!" }
+    { en: "I have a lot on my plate.", phonetic: "Ái rév ê lót ón mái pléit.", pt: "Estou cheio de coisas para fazer.", location: "📍 Estação 71", scene: "Gatilho: Prato cheio transbordando papéis." },
+    { en: "Can we reschedule?", phonetic: "Kên uí rí-ské-jiul?", pt: "Podemos remarcar?", location: "📍 Estação 72", scene: "Gatilho: Mudar a data da folha do calendário." },
+    { en: "I'll handle it.", phonetic: "Áil rên-dôl ít.", pt: "Eu cuido disso.", location: "📍 Estação 73", scene: "Gatilho: Pegando o volante da situação." },
+    { en: "Keep me posted.", phonetic: "Kíp mí póus-têd.", pt: "Mantenha-me informado.", location: "📍 Estação 74", scene: "Gatilho: Post-it amarelo colado na parede." },
+    { en: "So far, so good.", phonetic: "Sóu fár, sóu gúd.", pt: "Até agora, tudo bem.", location: "📍 Estação 75", scene: "Gatilho: Dedão para cima em sinal de joinha." },
+    { en: "Back to square one.", phonetic: "Bêk tu skuêr uân.", pt: "De volta ao zero.", location: "📍 Estação 76", scene: "Gatilho: Peão voltando para a primeira casa do tabuleiro." },
+    { en: "It's a piece of cake.", phonetic: "Íts ê pís óvv kéik.", pt: "É mamão com açúcar / Muito fácil.", location: "📍 Estação 77", scene: "Gatilho: Um pedaço farto de bolo saboroso." },
+    { en: "Out of the blue.", phonetic: "Áut óvv đê blú.", pt: "Do nada / De surpresa.", location: "📍 Estação 78", scene: "Gatilho: Raio caindo em céu azul sem nuvens." },
+    { en: "I'll do my best.", phonetic: "Áil dú mái bêst.", pt: "Farei o meu melhor.", location: "📍 Estação 79", scene: "Gatilho: Levando a mão ao peito com determinação." },
+    { en: "Let's get down to business.", phonetic: "Lêts gét dáun tu bí-znês.", pt: "Vamos ao que interessa.", location: "📍 Estação 80", scene: "Gatilho: Abrindo uma maleta executiva." },
+
+    { en: "Can you hear me well?", phonetic: "Kên iu rír mí uél?", pt: "Você consegue me ouvir bem?", location: "📍 Estação 81", scene: "Gatilho: Mão atrás da orelha escutando." },
+    { en: "Your voice is breaking up.", phonetic: "Iór vóis íz bréi-kin áp.", pt: "Sua voz está cortando.", location: "📍 Estação 82", scene: "Gatilho: Linha de som falhando ou cortada." },
+    { en: "Call me back later.", phonetic: "Kól mí bêk léi-ter.", pt: "Me liga de volta mais tarde.", location: "📍 Estação 83", scene: "Gatilho: Telefone tocando com relógio ao lado." },
+    { en: "Text me when you get there.", phonetic: "Têkst mí uên iu gét đêr.", pt: "Me manda mensagem quando chegar.", location: "📍 Estação 84", scene: "Gatilho: Celular apitando mensagem." },
+    { en: "I missed your call.", phonetic: "Ái mís-t iór kól.", pt: "Perdi sua chamada.", location: "📍 Estação 85", scene: "Gatilho: Ícone de ligação perdida em vermelho." },
+    { en: "Drop me a line.", phonetic: "Dróp mí ê láin.", pt: "Me manda uma mensagem.", location: "📍 Estação 86", scene: "Gatilho: Carta caindo na caixa de correio." },
+    { en: "I'll call you right back.", phonetic: "Áil kól iu ráit bêk.", pt: "Já te ligo de volta.", location: "📍 Estação 87", scene: "Gatilho: Dedos discando rapidamente no celular." },
+    { en: "My battery is low.", phonetic: "Mái bê-tê-ri íz lóu.", pt: "Minha bateria está fraca.", location: "📍 Estação 88", scene: "Gatilho: Ícone vermelho de bateria descarregada." },
+    { en: "Thanks for calling.", phonetic: "TÉnks fór kó-lin.", pt: "Obrigado por ligar.", location: "📍 Estação 89", scene: "Gatilho: Sorriso no telefone ao desligar." },
+    { en: "Talk to you soon!", phonetic: "Tók tu iu sún!", pt: "Falo com você em breve!", location: "📍 Estação 90", scene: "Gatilho: Aceno rápido no telefone." },
+
+    { en: "It was nice talking to you.", phonetic: "Ít uôz náis tó-kin tu iu.", pt: "Foi bom conversar com você.", location: "📍 Estação 91", scene: "Gatilho: Aperto de mão amigável na despedida." },
+    { en: "Same here!", phonetic: "Séim rír!", pt: "Igualmente!", location: "📍 Estação 92", scene: "Gatilho: Espelho refletindo a mesma coisa." },
+    { en: "Have a safe trip!", phonetic: "Rév ê séif tríp!", pt: "Boa viagem!", location: "📍 Estação 93", scene: "Gatilho: Avião decolando suavemente." },
+    { en: "Enjoy your meal!", phonetic: "Ín-jói iór míol!", pt: "Bom apetite!", location: "📍 Estação 94", scene: "Gatilho: Prato fumegante e apetitoso." },
+    { en: "Make yourself at home.", phonetic: "Méik ior-sélfêt róum.", pt: "Sinta-se em casa.", location: "📍 Estação 95", scene: "Gatilho: Pantufas confortáveis na porta." },
+    { en: "Cross your fingers!", phonetic: "Krós iór fín-gêrz!", pt: "Torça por mim / Dedos cruzados!", location: "📍 Estação 96", scene: "Gatilho: Dedos indicador e médio cruzados." },
+    { en: "Time flies!", phonetic: "Táim fláis!", pt: "O tempo voa!", location: "📍 Estação 97", scene: "Gatilho: Relógio com asas voando." },
+    { en: "Better safe than sorry.", phonetic: "Bé-ter séif đên só-ri.", pt: "É melhor prevenir do que remediar.", location: "📍 Estação 98", scene: "Gatilho: Guarda-chuva aberto prevenindo a chuva." },
+    { en: "Practice makes perfect.", phonetic: "Prêk-tís méiks pûr-fêkt.", pt: "A prática leva à perfeição.", location: "📍 Estação 99", scene: "Gatilho: Degraus de uma escada rumo ao topo." },
+    { en: "You can do it!", phonetic: "Iú kên dú ít!", pt: "Você consegue!", location: "📍 Estação 100", scene: "Gatilho: Braço forte fazendo sinal de força e vitória." }
 ];
 
 let currentIndex = 0;
@@ -328,6 +363,11 @@ function loadPhrase() {
     document.getElementById('phrase-en').innerText = item.en;
     document.getElementById('phrase-phonetic').innerText = item.phonetic;
     document.getElementById('phrase-pt').innerText = item.pt;
+    
+    // Atualização dos campos do Palácio da Memória
+    document.getElementById('memory-location').innerText = item.location || `📍 Estação ${currentIndex + 1}`;
+    document.getElementById('memory-scene').innerHTML = item.scene || "Visualize a cena correspondente no seu palácio mental.";
+
     document.getElementById('result').style.display = 'none';
 }
 
