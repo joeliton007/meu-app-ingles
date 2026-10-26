@@ -51,33 +51,38 @@
             margin-bottom: 12px;
         }
 
-        /* ÁREA DO MAPA MENTAL VISUAL */
+        /* ÁREA DO MAPA MENTAL ESTILIZADA (MOLDURA VISUAL) */
         .mindmap-box {
-            background: linear-gradient(135deg, #1f2a38 0%, #161d26 100%);
-            border: 1px solid #3a4b61;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px dashed #3b82f6;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 15px;
             text-align: left;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
         }
         .mindmap-header {
-            font-size: 0.75rem;
-            color: #4da6ff;
+            font-size: 0.8rem;
+            color: #60a5fa;
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .mindmap-location {
-            font-size: 0.9rem;
-            color: #ffca28;
+            font-size: 0.95rem;
+            color: #fbbf24;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .mindmap-desc {
-            font-size: 0.85rem;
-            color: #e0e0e0;
-            line-height: 1.3;
+            font-size: 0.9rem;
+            color: #f3f4f6;
+            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 10px;
+            border-radius: 8px;
+            border-left: 3px solid #fbbf24;
         }
 
         .btn {
@@ -190,9 +195,9 @@
     <div class="phrase-phonetic" id="phrase-phonetic">...</div>
     <div class="phrase-pt" id="phrase-pt">...</div>
 
-    <!-- Bloco integrado de Mapa Mental / Mnemônica -->
+    <!-- Bloco Visual de Mapa Mental -->
     <div class="mindmap-box">
-        <div class="mindmap-header">🧠 Mapa Mental | Palácio da Memória</div>
+        <div class="mindmap-header">🗺️ Mapa Mental | Palácio da Memória</div>
         <div class="mindmap-location" id="mindmap-location">...</div>
         <div class="mindmap-desc" id="mindmap-desc">...</div>
     </div>
@@ -221,7 +226,6 @@
 
 <script>
 const phrases = [
-    // 1 a 10: Cumprimentos e Conversa Inicial
     { en: "How is it going?", phonetic: "Ráu íz it góuin?", pt: "Como vão as coisas?", location: "📍 Estação 1: Porta de Entrada", scene: "Visualize a <b>Áurea</b> na Porta de Entrada, pegando um <b>Gole</b> e <b>Indo</b> embora correndo." },
     { en: "What have you been up to?", phonetic: "Uát révv iu bín áp tu?", pt: "O que você tem feito de bom?", location: "📍 Estação 2: Sala de Estar", scene: "Visualize um <b>Uat</b>er com o <b>Apt</b>o em cima do sofá te perguntando o que você fez." },
     { en: "Long time no see!", phonetic: "Lóng táim nóu sí!", pt: "Quanto tempo a gente não se vê!", location: "📍 Estação 3: Corredor", scene: "Visualize um dragão <b>Longo</b> e um <b>Time</b> sem ver ninguém no escuro do corredor." },
@@ -233,7 +237,6 @@ const phrases = [
     { en: "That makes sense.", phonetic: "Đêt méiks sêns.", pt: "Faz sentido.", location: "📍 Estação 9: Garagem", scene: "Visualize alguém fazendo uma <b>Meica</b> com <b>Censo</b> no carro." },
     { en: "I see what you mean.", phonetic: "Ái sí uát iu mín.", pt: "Entendi o que você quer dizer.", location: "📍 Estação 10: Portão Principal", scene: "Visualize você vendo (<b>Sí</b>) uma mina (<b>Mín</b>) passando pelo portão." },
 
-    // 11 a 20: Opinião e Expressões
     { en: "To be honest...", phonetic: "Tu bí ónêst...", pt: "Para ser sincero...", location: "📍 Estação 11: Jardim", scene: "Visualize uma abelha (<b>Bí</b>) sendo honesta colhendo flor no jardim." },
     { en: "In my opinion...", phonetic: "Ín mái ô-pí-niôn...", pt: "Na minha opinião...", location: "📍 Estação 12: Sacada", scene: "Visualize uma <b>Opinião</b> escrita em letras gigantes pendurada na sacada." },
     { en: "If you ask me...", phonetic: "Íf iu êsk mí...", pt: "Se você quer saber...", location: "📍 Estação 13: Lavanderia", scene: "Visualize alguém te fazendo uma pergunta enquanto usa o <b>Ésk</b>." },
@@ -245,7 +248,6 @@ const phrases = [
     { en: "No worries!", phonetic: "Nóu uó-rîs!", pt: "Sem problemas!", location: "📍 Estação 19: Adega", scene: "Visualize garrafas sem nenhuma preocupação." },
     { en: "It's up to you.", phonetic: "Íts áp tu iú.", pt: "Você quem sabe.", location: "📍 Estação 20: Piscina", scene: "Visualize alguém apontando para cima na beira da piscina." },
 
-    // 21 a 30: Pedindo Ajuda
     { en: "Could you help me out?", phonetic: "Kúd iu rélp mí áut?", pt: "Você poderia me dar uma ajuda?", location: "📍 Estação 21", scene: "Visualize alguém pedindo ajuda na porta." },
     { en: "What do you mean?", phonetic: "Uát dú iu mín?", pt: "O que você quer dizer?", location: "📍 Estação 22", scene: "Visualize uma mina perguntando o significado de algo." },
     { en: "Could you repeat that?", phonetic: "Kúd iu rí-pít đêt?", pt: "Poderia repetir isso?", location: "📍 Estação 23", scene: "Visualize um gravador repetindo o áudio no balcão." },
@@ -257,7 +259,6 @@ const phrases = [
     { en: "What's going on?", phonetic: "Uáts góuin ón?", pt: "O que está acontecendo?", location: "📍 Estação 29", scene: "Visualize pessoas surpresas olhando ao redor." },
     { en: "Are you free today?", phonetic: "Ár iu frí tu-déi?", pt: "Você está livre hoje?", location: "📍 Estação 30", scene: "Visualize um calendário marcado com livre." },
 
-    // 31 a 40: Rotina e Ações
     { en: "I'm on my way.", phonetic: "Áim ón mái uéi.", pt: "Estou a caminho.", location: "📍 Estação 31", scene: "Visualize alguém correndo no meio do caminho." },
     { en: "I'll be right back.", phonetic: "Áil bí ráit bêk.", pt: "Já volto.", location: "📍 Estação 32", scene: "Visualize uma placa de volta em breve na porta." },
     { en: "Take your time.", phonetic: "Téik iór táim.", pt: "Sem pressa.", location: "📍 Estação 33", scene: "Visualize um relógio derretendo sem pressa." },
@@ -269,7 +270,6 @@ const phrases = [
     { en: "Catch you later!", phonetic: "Kêtch iu léi-ter!", pt: "Te vejo mais tarde!", location: "📍 Estação 39", scene: "Visualize acenando um tchau de longe." },
     { en: "Have a good one!", phonetic: "Rév ê gúd uân!", pt: "Tenha um ótimo dia!", location: "📍 Estação 40", scene: "Visualize um sorriso brilhante na saída." },
 
-    // 41 a 50: Reações Naturais
     { en: "Are you kidding me?", phonetic: "Ár iu kí-din mí?", pt: "Tá de brincadeira comigo?", location: "📍 Estação 41", scene: "Visualize um palhaço dando risada." },
     { en: "You've got to be kidding!", phonetic: "Iúvv gót tu bí kí-din!", pt: "Só pode ser piada!", location: "📍 Estação 42", scene: "Visualize alguém rindo sem acreditar." },
     { en: "That's awesome!", phonetic: "Đêts ó-sôm!", pt: "Isso é incrível!", location: "📍 Estação 43", scene: "Visualize fogos de artifício estourando." },
@@ -281,7 +281,6 @@ const phrases = [
     { en: "That's pretty cool.", phonetic: "Đêts blí-ti kúl.", pt: "Bem legal isso.", location: "📍 Estação 49", scene: "Visualize óculos de sol estilosos caindo no rosto." },
     { en: "Keep up the good work!", phonetic: "Kíp áp đê gúd uôrk!", pt: "Continue com o ótimo trabalho!", location: "📍 Estação 50", scene: "Visualize um troféu brilhando na mesa." },
 
-    // 51 a 60: Tomando Decisões
     { en: "Let me think about it.", phonetic: "Lêt mí tÉnk ê-báut ít.", pt: "Deixa eu pensar nisso.", location: "📍 Estação 51", scene: "Visualize uma nuvem de pensamento acima da cabeça." },
     { en: "I'll let you know.", phonetic: "Áil lêt iu nóu.", pt: "Eu te aviso.", location: "📍 Estação 52", scene: "Visualize enviando uma carta ou mensagem." },
     { en: "Make up your mind.", phonetic: "Méik áp iór máind.", pt: "Decida-se.", location: "📍 Estação 53", scene: "Visualize uma balança de dois lados equilibrando." },
@@ -293,7 +292,6 @@ const phrases = [
     { en: "Let's give it a try.", phonetic: "Lêts gív ít ê trái.", pt: "Vamos tentar.", location: "📍 Estação 59", scene: "Visualize apertando um botão verde de START." },
     { en: "Better late than never.", phonetic: "Bé-ter léit đên né-ver.", pt: "Antes tarde do que nunca.", location: "📍 Estação 60", scene: "Visualize tartaruga cruzando a linha de chegada feliz." },
 
-    // 61 a 70: Sentimentos e Estados
     { en: "I'm exhausted.", phonetic: "Áim êg-zós-têd.", pt: "Estou exausto.", location: "📍 Estação 61", scene: "Visualize bateria no 1% piscando." },
     { en: "I'm starving!", phonetic: "Áim stár-vin!", pt: "Estou morrendo de fome!", location: "📍 Estação 62", scene: "Visualize prato vazio com garfo e faca." },
     { en: "I feel sick.", phonetic: "Ái fíl sík.", pt: "Estou me sentindo mal.", location: "📍 Estação 63", scene: "Visualize termômetro e copo d'água na mesa." },
@@ -305,7 +303,6 @@ const phrases = [
     { en: "I lost my train of thought.", phonetic: "Ái lóst mái tréin óvv tót.", pt: "Perdi o fio da meada.", location: "📍 Estação 69", scene: "Visualize um trem saindo dos trilhos de fumaça." },
     { en: "I'm in a hurry.", phonetic: "Áim ín ê rê-ri.", pt: "Estou com pressa.", location: "📍 Estação 70", scene: "Visualize alguém correndo com sapato voando." },
 
-    // 71 a 80: Trabalho e Compromissos
     { en: "I have a lot on my plate.", phonetic: "Ái rév ê lót ón mái pléit.", pt: "Estou cheio de coisas para fazer.", location: "📍 Estação 71", scene: "Visualize prato cheio transbordando papéis." },
     { en: "Can we reschedule?", phonetic: "Kên uí rí-ské-jiul?", pt: "Podemos remarcar?", location: "📍 Estação 72", scene: "Visualize mudar a data da folha do calendário." },
     { en: "I'll handle it.", phonetic: "Áil rên-dôl ít.", pt: "Eu cuido disso.", location: "📍 Estação 73", scene: "Visualize pegando o volante da situação." },
@@ -317,7 +314,6 @@ const phrases = [
     { en: "I'll do my best.", phonetic: "Áil dú mái bêst.", pt: "Farei o meu melhor.", location: "📍 Estação 79", scene: "Visualize levando a mão ao peito com determinação." },
     { en: "Let's get down to business.", phonetic: "Lêts gét dáun tu bí-znês.", pt: "Vamos ao que interessa.", location: "📍 Estação 80", scene: "Visualize abrindo uma maleta executiva." },
 
-    // 81 a 90: Conversas de Telefone e Mensagens
     { en: "Can you hear me well?", phonetic: "Kên iu rír mí uél?", pt: "Você consegue me ouvir bem?", location: "📍 Estação 81", scene: "Visualize mão atrás da orelha escutando." },
     { en: "Your voice is breaking up.", phonetic: "Iór vóis íz bréi-kin áp.", pt: "Sua voz está cortando.", location: "📍 Estação 82", scene: "Visualize linha de som falhando ou cortada." },
     { en: "Call me back later.", phonetic: "Kól mí bêk léi-ter.", pt: "Me liga de volta mais tarde.", location: "📍 Estação 83", scene: "Visualize telefone tocando com relógio ao lado." },
@@ -329,7 +325,6 @@ const phrases = [
     { en: "Thanks for calling.", phonetic: "TÉnks fór kó-lin.", pt: "Obrigado por ligar.", location: "📍 Estação 89", scene: "Visualize sorriso no telefone ao desligar." },
     { en: "Talk to you soon!", phonetic: "Tók tu iu sún!", pt: "Falo com você em breve!", location: "📍 Estação 90", scene: "Visualize aceno rápido no telefone." },
 
-    // 91 a 100: Encerramento e Frases Úteis
     { en: "It was nice talking to you.", phonetic: "Ít uôz náis tó-kin tu iu.", pt: "Foi bom conversar com você.", location: "📍 Estação 91", scene: "Visualize aperto de mão amigável na despedida." },
     { en: "Same here!", phonetic: "Séim rír!", pt: "Igualmente!", location: "📍 Estação 92", scene: "Visualize espelho refletindo a mesma coisa." },
     { en: "Have a safe trip!", phonetic: "Rév ê séif tríp!", pt: "Boa viagem!", location: "📍 Estação 93", scene: "Visualize avião decolando suavemente." },
@@ -367,7 +362,6 @@ function loadPhrase() {
     document.getElementById('phrase-phonetic').innerText = item.phonetic;
     document.getElementById('phrase-pt').innerText = item.pt;
     
-    // Atualiza os dados do mapa mental / palácio da memória
     document.getElementById('mindmap-location').innerText = item.location || `📍 Estação ${currentIndex + 1}`;
     document.getElementById('mindmap-desc').innerHTML = item.scene || "Visualize a cena correspondente no seu palácio mental.";
 
